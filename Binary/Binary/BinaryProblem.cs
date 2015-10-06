@@ -7,25 +7,44 @@ namespace Binary
     public class BinaryProblem
     {
         [TestMethod]
-        public void TestMethod1()
+        public void TestSumOf13And22()
         {
             Assert.AreEqual(35, CalculateSum(13, 22));
         }
 
         [TestMethod]
-        public void TestMethod2()
+        public void TestSumOf22And23()
         {
             Assert.AreEqual(45, CalculateSum(23, 22));
         }
 
-        private static int CalculateSum(int firstNumber, int secondNumber)
+        [TestMethod]
+        public void TestSubtractOf5And3()
         {
-            long firstBase2 = CalculateInBase2(firstNumber);
-            long secondBase2 = CalculateInBase2(secondNumber);
-            return CalculateInBase10(CalculateBinarySum(firstBase2, secondBase2));
+            Assert.AreEqual(2, CalculateSubtract(5, 3));
         }
 
-        private static long CalculateBinarySum(long firstBase2, long secondBase2)
+        [TestMethod]
+        public void TestSubtractOf22And13()
+        {
+            Assert.AreEqual(9, CalculateSubtract(22, 13));
+        }
+
+        private static int CalculateSum(int firstNumber, int secondNumber)
+        {
+            long firstNumberBase2 = CalculateInBase2(firstNumber);
+            long secondNumberBase2 = CalculateInBase2(secondNumber);
+            return CalculateInBase10(CalculateBinarySum(firstNumberBase2, secondNumberBase2));
+        }
+
+        private static int CalculateSubtract(int firstNumber, int secondNumber)
+        {
+            long firstNumberBase2 = CalculateInBase2(firstNumber);
+            long secondNumberBase2 = CalculateInBase2(secondNumber);
+            return CalculateInBase10(CalculateBinarySubtract(firstNumberBase2, secondNumberBase2));
+        }
+
+        private static long CalculateBinarySum(long firstNumberBase2, long secondNumberBase2)
         { 
             int numberKeepInMind = 0;
             long result1 = 0;
@@ -33,12 +52,12 @@ namespace Binary
             long result = 0;
             long sum = 0;
             int power = 0;
-            while ((firstBase2 != 0) || (secondBase2 != 0) || (numberKeepInMind!=0))
+            while ((firstNumberBase2 != 0) || (secondNumberBase2 != 0) || (numberKeepInMind!=0))
             {
-                result1 = (long)firstBase2 % 10;
-                firstBase2 /= 10;
-                result2 = (long)secondBase2 % 10;
-                secondBase2 /= 10;
+                result1 = (long)firstNumberBase2 % 10;
+                firstNumberBase2 /= 10;
+                result2 = (long)secondNumberBase2 % 10;
+                secondNumberBase2 /= 10;
                 result = result1 + result2 + numberKeepInMind;
                 if (result == 2)
                 {
@@ -56,6 +75,30 @@ namespace Binary
                 power++;
             }
             return sum; 
+        }
+
+        private static long CalculateBinarySubtract(long firstNumberBase2, long secondNumberBase2)
+        {
+            long result = 0;
+            long number = 0;
+            int lengthFirstNumber = CalculateLength(firstNumberBase2);
+            int lengthSecondNumber = CalculateLength(secondNumberBase2);
+            for (int i = 0; i < lengthFirstNumber; i++)
+            {
+                if (i < lengthSecondNumber)
+                {
+                    result = secondNumberBase2 % 10;
+                    secondNumberBase2 /= 10;
+                    result = result == 0 ? 1 : 0;
+                    number = (long)(number + result * Math.Pow(10, i));
+                }
+                else
+                    number= (long)(number + 1 * Math.Pow(10,i));
+            }
+            long firstSum = CalculateBinarySum(number, 1);
+            long finalResult = CalculateBinarySum(firstSum, firstNumberBase2);
+            int lengthSecondSum = CalculateLength(finalResult);
+            return finalResult = (long)(finalResult % Math.Pow(10, lengthSecondSum - 1));
         }
 
         private static long CalculateInBase2(int number)
@@ -86,6 +129,17 @@ namespace Binary
                 power++;
             }
             return intNumber;
+        }
+
+        private static int CalculateLength(long number)
+        {
+            int count = 0;
+            while (number != 0)
+            {
+                number /= 10;
+                count++;
+            }
+            return count;
         }
     }
 }
