@@ -1,5 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace Binary
 {
@@ -130,6 +132,31 @@ namespace Binary
             }
             return intNumber;
         }
+
+        private static byte[] ConvertNumber(int givenNumber, int givenBase)
+        {
+            List<byte> listArray = new List<byte>();
+            while (givenNumber != 0)
+            {
+                listArray.Add((byte)(givenNumber % givenBase));
+                givenNumber /= givenBase;
+            }
+            byte[] array = listArray.ToArray();
+            Array.Reverse(array);
+            return array;
+        }
+
+        [TestMethod]
+        public void TestConvertNumber()
+        {
+            byte[] array = new byte[] { 1, 0, 1, 0};
+
+            bool areEqual = array.SequenceEqual(ConvertNumber(10,2)); // true
+            Assert.IsTrue(areEqual);
+        }
+        
+
+
 
         private static int CalculateLength(long number)
         {
