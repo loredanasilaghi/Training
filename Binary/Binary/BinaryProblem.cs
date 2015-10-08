@@ -40,9 +40,9 @@ namespace Binary
 
         private static int CalculateDecimalSum(int firstNumber, int secondNumber)
         {
-            byte[] firstBinaryNumber = ConvertFromDecimal(firstNumber, 2);
-            byte[] secondBinaryNumber = ConvertFromDecimal(secondNumber, 2);
-            return ConvertToDecimal(CalculateBinarySum(firstBinaryNumber, secondBinaryNumber),2);
+            //byte[] firstBinaryNumber = ConvertFromDecimal(firstNumber, 2);
+            //byte[] secondBinaryNumber = ConvertFromDecimal(secondNumber, 2);
+            return ConvertToDecimal(CalculateBinarySum(firstNumber, secondNumber, 2), 2);
         }
 
         //private static int CalculateSubtract(int firstNumber, int secondNumber)
@@ -52,8 +52,23 @@ namespace Binary
         //    return CalculateInBase10(CalculateBinarySubtract(firstNumberBase2, secondNumberBase2));
         //}
 
-        private static byte[] CalculateBinarySum(byte[] firstBinaryNumber, byte[] secondBinaryNumber)
+        //private static int CalculateSum(int firstNumber, int secondNumber, int toBase)
+        //{
+        //    byte[] firstBinaryNumber = ConvertFromDecimal(firstNumber, toBase);
+        //    byte[] secondBinaryNumber = ConvertFromDecimal(secondNumber, toBase);
+        //    byte[] aux;
+        //    if (firstBinaryNumber.Length < secondBinaryNumber.Length)
+        //    {
+        //        aux = firstBinaryNumber;
+        //        firstBinaryNumber = secondBinaryNumber;
+        //        secondBinaryNumber = aux;
+        //    }
+        //}
+
+        private static byte[] CalculateBinarySum(int firstNumber, int secondNumber, int toBase)
         {
+            byte[] firstBinaryNumber = ConvertFromDecimal(firstNumber, toBase);
+            byte[] secondBinaryNumber = ConvertFromDecimal(secondNumber, toBase);
             byte[] aux;
             if (firstBinaryNumber.Length < secondBinaryNumber.Length)
             {
@@ -61,24 +76,30 @@ namespace Binary
                 firstBinaryNumber = secondBinaryNumber;
                 secondBinaryNumber = aux;
             }
-
             int numberKeepInMind = 0;
             int length = 0;
             int difference = 0;
             byte[] sumBinary;
-            int sum=0;
-            byte[] optionalArray;
+            int sum = 0;
+            //byte[] optionalArray;
             difference = firstBinaryNumber.Length - secondBinaryNumber.Length;
             length = firstBinaryNumber.Length;
-            optionalArray = new byte[length];
-            sumBinary = new byte[length+1];
-            for (int i = 0; i < secondBinaryNumber.Length; i++)
+            //optionalArray = new byte[length];
+            sumBinary = new byte[length + 1];
+            if (difference != 0)
             {
-                optionalArray[i + difference] = secondBinaryNumber[i];
+                Array.Resize(ref secondBinaryNumber, length);
+                for (int i = secondBinaryNumber.Length - 1; i >= 0; i--)
+                {
+                    secondBinaryNumber[i + difference] = secondBinaryNumber[i];
+                    //optionalArray[i + difference] = secondBinaryNumber[i];
+                }
+                secondBinaryNumber[0] = 0;
             }
-            for (int j = length-1; j >=0; j--)
+            for (int j = length - 1; j >= 0; j--)
             {
-                sum = firstBinaryNumber[j] + optionalArray[j] + numberKeepInMind;
+                //sum = firstBinaryNumber[j] + optionalArray[j] + numberKeepInMind;
+                sum = firstBinaryNumber[j] + secondBinaryNumber[j] + numberKeepInMind;
                 if (sum == 2)
                 {
                     sum = 0;
@@ -91,39 +112,13 @@ namespace Binary
                 }
                 else
                     numberKeepInMind = 0;
-                sumBinary[j+1] = (byte)sum;
+                sumBinary[j + 1] = (byte)sum;
             }
 
             if (numberKeepInMind == 1)
                 sumBinary[0] = 1;
             return sumBinary;
         }
-
-        //    while ((firstBinaryNumber != 0) || (secondBinaryNumber != 0) || (numberKeepInMind != 0))
-        //    {
-        //        result = result1 + result2 + numberKeepInMind;
-        //        if (result == 2)
-        //        {
-        //            result = 0;
-        //            numberKeepInMind = 1;
-        //        }
-        //        else if (result == 3)
-        //        {
-        //            result = 1;
-        //            numberKeepInMind = 1;
-        //        }
-        //        else
-        //            numberKeepInMind = 0;
-        //        sum = (long)(sum + result * Math.Pow(10, power));
-        //        power++;
-        //    }
-        //    return sum;
-        //}
-
-        //private static byte[] AddNumbersInArray(byte[] firstBinaryNumber, byte[] secondBinaryNumber)
-        //{
-            
-        //}
 
         //private static long CalculateBinarySubtract(long firstNumberBase2, long secondNumberBase2)
         //{
@@ -189,14 +184,6 @@ namespace Binary
             byte[] array = new byte[] { 1, 0, 1, 0 };
             Assert.AreEqual(10, ConvertToDecimal(array, 2));
         }
-
-        //[TestMethod]
-        //public void TestConvertNumberToDecimal()
-        //{
-        //    byte[] array = new byte[] { 1, 0 };
-
-        //    bool areEqual = array.SequenceEqual(ConvertNumberToDecimal(1010)); // true
-        //    Assert.IsTrue(areEqual);
-        //}
+        
     }
 }
