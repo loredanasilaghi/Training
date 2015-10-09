@@ -18,25 +18,25 @@ namespace Binary
         [TestMethod]
         public void TestSumOf13And22UsingBase2()
         {
-            Assert.AreEqual(35, CalculateSum(22, 13, 2));
+            Assert.AreEqual(35, CalculateSumOfIntegerNumbers(22, 13, 2));
         }
 
         [TestMethod]
         public void TestSumOf22And23UsingBase2()
         {
-            Assert.AreEqual(45, CalculateSum(23, 22, 2));
+            Assert.AreEqual(45, CalculateSumOfIntegerNumbers(23, 22, 2));
         }
 
         [TestMethod]
         public void TestSumOf14And12UsingBase2()
         {
-            Assert.AreEqual(26, CalculateSum(12, 14, 2));
+            Assert.AreEqual(26, CalculateSumOfIntegerNumbers(12, 14, 2));
         }
 
         [TestMethod]
         public void TestSumOf43And75UsingBase8()
         {
-            Assert.AreEqual(118, CalculateSum(43, 75, 8));
+            Assert.AreEqual(118, CalculateSumOfIntegerNumbers(43, 75, 8));
         }
         
         [TestMethod]
@@ -63,10 +63,10 @@ namespace Binary
         [TestMethod]
         public void TestOperationOr()
         {
-            byte[] first = new byte[] { 1, 0, 0, 1 };
+            byte[] first =new byte[] { 1, 0, 0, 1 };
             byte[] second = new byte[] { 1, 1, 0, 1, 0 };
             byte[] expected = new byte[] { 1, 1, 0, 1, 1 };
-            Assert.IsTrue(expected.SequenceEqual(CalculateOperation(first, second, Operation.Or)));
+            CollectionAssert.AreEqual(expected, CalculateOperation(first, second, Operation.Or));
         }
 
         [TestMethod]
@@ -75,7 +75,7 @@ namespace Binary
             byte[] first = new byte[] { 1, 0, 0, 1 };
             byte[] second = new byte[] { 1, 1, 0, 1, 0 };
             byte[] expected = new byte[] { 0, 1, 0, 0, 0 };
-            Assert.IsTrue(expected.SequenceEqual(CalculateOperation(first, second, Operation.And)));
+            CollectionAssert.AreEqual(expected,(CalculateOperation(first, second, Operation.And)));
         }
 
         [TestMethod]
@@ -84,7 +84,7 @@ namespace Binary
             byte[] first = new byte[] { 1, 0, 0, 1 };
             byte[] second = new byte[] { 1, 1, 0, 1, 0 };
             byte[] expected = new byte[] { 1, 0, 0, 1, 1 };
-            Assert.IsTrue(expected.SequenceEqual(CalculateOperation(first, second, Operation.Xor)));
+            CollectionAssert.AreEqual(expected,(CalculateOperation(first, second, Operation.Xor)));
         }
 
         [TestMethod]
@@ -92,109 +92,114 @@ namespace Binary
         {
             byte[] given = new byte[] { 1, 0, 1, 1 };
             byte[] expected = new byte[] { 0, 0, 1, 0 };
-            Assert.IsTrue(expected.SequenceEqual(CalculateShift(given, 2, true)));
+            CollectionAssert.AreEqual(expected,(CalculateRightShift(given, 2)));
         }
 
         [TestMethod]
         public void TestShiftToLeft()
         {
             byte[] given = new byte[] { 1, 0, 1, 1 };
-            byte[] expected = new byte[] { 1, 1, 0, 0 };
-            Assert.IsTrue(expected.SequenceEqual(CalculateShift(given, 2, false)));
+            byte[] expected = new byte[] { 1, 0, 1, 1, 0, 0, 0};
+            CollectionAssert.AreEqual(expected, (CalculateLeftShift(given, 3)));
         }
 
         private static byte[] CalculateOperation(byte[] firstBinaryNumber, byte[] secondBinaryNumber, Operation operation)
         {
             SwapNumbers(ref firstBinaryNumber, ref secondBinaryNumber);
             AddZerosInArray(ref firstBinaryNumber, ref secondBinaryNumber);
+            return DoOperation(firstBinaryNumber, secondBinaryNumber, operation);
+        }
 
+        private static byte[] DoOperation(byte[] firstBinaryNumber, byte[] secondBinaryNumber, Operation operation)
+        {
             byte[] result = new byte[firstBinaryNumber.Length];
 
-            for(int i=0; i < result.Length; i++)
+            for (int i = 0; i < result.Length; i++)
             {
                 result[i] = Calculate(firstBinaryNumber[i], secondBinaryNumber[i], operation);
             }
+
             return result;
         }
 
-        private static byte[] CalculateShift(byte[] binaryNumber, int shift, bool toRight)
+        private static byte[] CalculateLeftShift(byte[] binaryNumber, int shift)
         {
-            if (toRight)
+            for (int i = 1; i  <= shift; i++)
             {
-                Array.Reverse(binaryNumber);
-            }            
-            for (int i = 0; i < shift; i++)
-            {
-                for (int j = 1; j < binaryNumber.Length; j++)
-                {
-                    binaryNumber[j - 1] = binaryNumber[j];
-                }
-                binaryNumber[binaryNumber.Length - 1] = 0;
+                Array.Resize(ref binaryNumber, binaryNumber.Length + 1);
             }
-            if (toRight)
+            return binaryNumber;
+        }
+
+        private static byte[] CalculateRightShift(byte[] binaryNumber, int shift)
+        {
+            for (int i = 0; i < shift;i++)
             {
-                Array.Reverse(binaryNumber);
+                for (int j = binaryNumber.Length - 2; j>=0; j--)
+                {
+                    binaryNumber[j + 1] = binaryNumber[j];
+                }
+                binaryNumber[0] = 0;
             }
             return binaryNumber;
         }
 
         private static byte Calculate(byte value1, byte value2, Operation operation)
         {
-            byte result = 0;
             switch (operation)
             {
                 case Operation.Or:
-                {
-                    if ((value1 == 1) || (value2 == 1))
-                        result = 1;
-                    else
-                        result = 0;
-                    break;
-                }
+                        return ComputeOr(value1, value2);
                 case Operation.And:
-                {
-                    if ((value1 == 1) && (value2 == 1))
-                        result = 1;
-                    else
-                        result = 0;
-                    break;
-                }
+                        return ComputeAnd(value1, value2);
                 case Operation.Xor:
-                {
-                    if (value1 == value2)
-                        result = 0;
-                    else
-                        result = 1;
-                    break;
-                }
+                        return ComputeXor(value1, value2);
             }
-            return result;
+            return 0;
         }
 
-        private static int CalculateSum(int firstNumber, int secondNumber, int toBase)
+        private static byte ComputeXor(byte value1, byte value2)
+        {
+            byte result;
+            return result = (byte)((value1 == value2) ? 0 : 1);
+        }
+
+        private static byte ComputeAnd(byte value1, byte value2)
+        {
+            byte result;
+            return result = (byte) (((value1 == 1) && (value2 == 1)) ? 1 : 0);
+        }
+
+        private static byte ComputeOr(byte value1, byte value2)
+        {
+            byte result;
+            return result = (byte)(((value1 == 1) || (value2 == 1)) ? 1 : 0);
+        }
+        
+        private static int CalculateSumOfIntegerNumbers(int firstNumber, int secondNumber, int toBase)
         {
             byte[] firstBinaryNumber = ConvertFromDecimal(firstNumber, toBase);
             byte[] secondBinaryNumber = ConvertFromDecimal(secondNumber, toBase);
+            return ConvertToDecimal(CalculateSum(firstBinaryNumber, secondBinaryNumber, toBase), toBase);
+        }
+
+        private static byte[] CalculateSum(byte[] firstBinaryNumber, byte[] secondBinaryNumber, int toBase)
+        {
             SwapNumbers(ref firstBinaryNumber, ref secondBinaryNumber);
-
-            int numberKeepInMind = 0;
-            byte[] sumBinary;
-            int sum = 0;
-            int mode = 0;
-            sumBinary = new byte[firstBinaryNumber.Length + 1];
+            byte[] sumBinary = new byte[firstBinaryNumber.Length + 1];
             AddZerosInArray(ref firstBinaryNumber, ref secondBinaryNumber);
-
+            int numberKeepInMind = 0;
             for (int j = firstBinaryNumber.Length - 1; j >= 0; j--)
             {
-                sum = firstBinaryNumber[j] + secondBinaryNumber[j] + numberKeepInMind;
-                mode = sum % toBase;
+                int sum = firstBinaryNumber[j] + secondBinaryNumber[j] + numberKeepInMind;
+                int mode = sum % toBase;
                 numberKeepInMind = sum / toBase;
                 sumBinary[j + 1] = (byte)mode;
             }
 
             if (numberKeepInMind == 1)
                 sumBinary[0] = 1;
-            return ConvertToDecimal(sumBinary, toBase);
+            return sumBinary;
         }
 
         private static void AddZerosInArray(ref byte[] firstBinaryNumber, ref byte[] secondBinaryNumber)
