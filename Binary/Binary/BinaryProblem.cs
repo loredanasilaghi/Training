@@ -40,6 +40,24 @@ namespace Binary
         }
         
         [TestMethod]
+        public void TestSubtractUsingBase2()
+        {
+            Assert.AreEqual(2, CalculateSubtractOfIntegerNumbers(5, 3, 2));
+        }
+
+        [TestMethod]
+        public void TestSubtractOf22And13UsingBase2()
+        {
+            Assert.AreEqual(9, CalculateSubtractOfIntegerNumbers(22, 13, 2));
+        }
+
+        [TestMethod]
+        public void TestSubtractOf43And75UsingBase8()
+        {
+            Assert.AreEqual(32, CalculateSubtractOfIntegerNumbers(43, 75, 8));
+        }
+
+        [TestMethod]
         public void TestConversion()
         {
             Assert.AreEqual(20, ConvertToDecimal(ConvertFromDecimal(20, 8), 8));
@@ -103,10 +121,18 @@ namespace Binary
             CollectionAssert.AreEqual(expected, (CalculateLeftShift(given, 3)));
         }
 
+        [TestMethod]
+        public void TestNot()
+        {
+            byte[] given = new byte[] { 1, 0 };
+            byte[] expected = new byte[] { 0, 1 };
+            CollectionAssert.AreEqual(expected, (ComputeNotByteArray(given)));
+        }
+
         private static byte[] CalculateOperation(byte[] firstBinaryNumber, byte[] secondBinaryNumber, Operation operation)
         {
             SwapNumbers(ref firstBinaryNumber, ref secondBinaryNumber);
-            AddZerosInArray(ref firstBinaryNumber, ref secondBinaryNumber);
+            secondBinaryNumber = AddZerosInArray(firstBinaryNumber, secondBinaryNumber);
             return DoOperation(firstBinaryNumber, secondBinaryNumber, operation);
         }
 
@@ -160,22 +186,43 @@ namespace Binary
 
         private static byte ComputeXor(byte value1, byte value2)
         {
-            byte result;
-            return result = (byte)((value1 == value2) ? 0 : 1);
+            return (byte)((value1 == value2) ? 0 : 1);
         }
 
         private static byte ComputeAnd(byte value1, byte value2)
         {
-            byte result;
-            return result = (byte) (((value1 == 1) && (value2 == 1)) ? 1 : 0);
+            return (byte) (((value1 == 1) && (value2 == 1)) ? 1 : 0);
         }
 
         private static byte ComputeOr(byte value1, byte value2)
         {
-            byte result;
-            return result = (byte)(((value1 == 1) || (value2 == 1)) ? 1 : 0);
+            return (byte)(((value1 == 1) || (value2 == 1)) ? 1 : 0);
         }
-        
+
+        private static byte ComputeNotByte(byte value)
+        {
+            return (byte)((value==1) ? 0 : 1);
+        }
+
+        private static byte[] ComputeNotByteArray(byte[] value)
+        {
+            for (int i = 0; i < value.Length; i++)
+            {
+                value[i] = ComputeNotByte(value[i]);
+            }
+            return value;
+        }
+
+        private static byte[] MoveToLeft(byte[] binaryNumber)
+        {
+            for (int j = 1; j < binaryNumber.Length; j++)
+            {
+                binaryNumber[j - 1] = binaryNumber[j];
+            }
+            Array.Resize(ref binaryNumber, binaryNumber.Length - 1);
+            return binaryNumber;
+        }
+
         private static int CalculateSumOfIntegerNumbers(int firstNumber, int secondNumber, int toBase)
         {
             byte[] firstBinaryNumber = ConvertFromDecimal(firstNumber, toBase);
@@ -183,11 +230,24 @@ namespace Binary
             return ConvertToDecimal(CalculateSum(firstBinaryNumber, secondBinaryNumber, toBase), toBase);
         }
 
+        private static int CalculateSubtractOfIntegerNumbers(int firstNumber, int secondNumber, int toBase)
+        {
+            if(firstNumber<secondNumber)
+            {
+                int aux = firstNumber;
+                firstNumber = secondNumber;
+                secondNumber = aux;
+            }
+            byte[] firstBinaryNumber = ConvertFromDecimal(firstNumber, toBase);
+            byte[] secondBinaryNumber = ConvertFromDecimal(secondNumber, toBase);
+            return ConvertToDecimal(CalculateSubtract(firstBinaryNumber, secondBinaryNumber, toBase), toBase);
+        }
+
         private static byte[] CalculateSum(byte[] firstBinaryNumber, byte[] secondBinaryNumber, int toBase)
         {
             SwapNumbers(ref firstBinaryNumber, ref secondBinaryNumber);
             byte[] sumBinary = new byte[firstBinaryNumber.Length + 1];
-            AddZerosInArray(ref firstBinaryNumber, ref secondBinaryNumber);
+            secondBinaryNumber = AddZerosInArray(firstBinaryNumber, secondBinaryNumber);
             int numberKeepInMind = 0;
             for (int j = firstBinaryNumber.Length - 1; j >= 0; j--)
             {
@@ -199,10 +259,37 @@ namespace Binary
 
             if (numberKeepInMind == 1)
                 sumBinary[0] = 1;
+            else
+                sumBinary = MoveToLeft(sumBinary);
             return sumBinary;
         }
 
-        private static void AddZerosInArray(ref byte[] firstBinaryNumber, ref byte[] secondBinaryNumber)
+        private static byte[] CalculateSubtract(byte[] firstBinaryNumber, byte[] secondBinaryNumber, int toBase)
+        {
+            secondBinaryNumber = AddZerosInArray(firstBinaryNumber, secondBinaryNumber);
+            int noKeepInMind = 0;
+            byte[] subtractBinary = new byte[secondBinaryNumber.Length];
+            for (int i = secondBinaryNumber.Length - 1; i >= 0; i--)
+            {
+                if (noKeepInMind == 1)
+                {
+                    firstBinaryNumber[i] = (byte) (firstBinaryNumber[i] - 1);
+                }
+                if (secondBinaryNumber[i] > firstBinaryNumber[i])
+                {
+                    noKeepInMind = 1;
+                   firstBinaryNumber[i] = (byte)(firstBinaryNumber[i] + toBase);
+                }
+                else
+                    noKeepInMind = 0;
+
+                subtractBinary[i] = (byte)(firstBinaryNumber[i] - secondBinaryNumber[i]);
+            }
+
+            return subtractBinary;
+        }
+
+        private static byte[] AddZerosInArray(byte[] firstBinaryNumber, byte[] secondBinaryNumber)
         {
             int length = 0;
             int difference = 0;
@@ -218,6 +305,7 @@ namespace Binary
                 }
                 secondBinaryNumber[0] = 0;
             }
+            return secondBinaryNumber;
         }
 
         private static void SwapNumbers(ref byte[] firstBinaryNumber, ref byte[] secondBinaryNumber)
