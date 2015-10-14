@@ -17,16 +17,9 @@ namespace Recursivity
             expected[2] = new int[] { 1, 2, 1 };
             expected[3] = new int[] { 1, 3, 3, 1 };
             for (int i = 0; i < rowNumber; i++)
-                CollectionAssert.AreEqual(expected[i], GenerateRow(rowNumber)[i]);
+                CollectionAssert.AreEqual(expected[i], GenerateTriangle(rowNumber)[i]);
         }
-
-        [TestMethod]
-        public void TestWithRow0()
-        {
-            int[][] expected = { };
-            CollectionAssert.AreEqual(expected, GenerateRow(0));
-        }
-
+        
         [TestMethod]
         public void TestWithRow1()
         {
@@ -34,7 +27,7 @@ namespace Recursivity
             int[][] expected = new int[rowNumber] [];
             expected[0] = new int[] { 1 };
             for (int i = 0; i<rowNumber; i++)
-                CollectionAssert.AreEqual(expected[i], GenerateRow(rowNumber)[i]);
+                CollectionAssert.AreEqual(expected[i], GenerateTriangle(rowNumber)[i]);
         }
 
         [TestMethod]
@@ -45,32 +38,49 @@ namespace Recursivity
             expected[0] = new int[] { 1 };
             expected[1] = new int[] { 1, 1 };
             for (int i = 0; i < rowNumber; i++)
-                CollectionAssert.AreEqual(expected[i], GenerateRow(rowNumber)[i]);
+                CollectionAssert.AreEqual(expected[i], GenerateTriangle(rowNumber)[i]);
         }
 
-        public static int[][] GenerateRow(int rowNumber)
+        public static int[][] GenerateTriangle(int rowNumber)
         {
             int[][] triangle = new int[rowNumber][];
-            for (int i = 1; i <= rowNumber; i++)
-            {
-                triangle[i-1] = new int[i];
-                for (int j = 0; j < i; j++)
-                {
-                    triangle[i-1][j] = GenerateNumbers(i, j);
-                }
-            }
+            rowNumber--;
+            InitializeTriangle(rowNumber, ref triangle);
+            PopulateTriangle(rowNumber, ref triangle);
+            GenerateNumbers(ref triangle, 0, 0);
             return triangle;
         }
-        
-        public static int GenerateNumbers(int row, int column)
+
+        private static void InitializeTriangle(int rowNumber, ref int[][] triangle)
         {
-            if (row == 0 || column == 0 || row == column + 1)
+            for (int row = 0; row <= rowNumber; row++)
+            {
+                triangle[row] = new int[row + 1];
+            }
+        }
+
+        private static void PopulateTriangle(int rowNumber, ref int[][] triangle)
+        {
+            for (int column = 0; column <= rowNumber; column++)
+            {
+                GenerateNumbers(ref triangle, rowNumber, column);
+            }
+        }
+        
+        public static int GenerateNumbers(ref int[][] triangle, int row, int column)
+        {
+            if(triangle[row][column]!=0)
+                return triangle[row][column];
+            if (row == 0 || column == 0 || row == column)
+            {
+                triangle[row][column] = 1;
                 return 1;
-            int leftNumber = 0;
-            int rightNumber = 0;
-            leftNumber = GenerateNumbers(row - 1, column - 1);
-            rightNumber = GenerateNumbers(row - 1, column);
-            return leftNumber + rightNumber;
+            }
+            int leftNumber = GenerateNumbers(ref triangle, row - 1, column - 1);
+            int rightNumber = GenerateNumbers(ref triangle, row - 1, column);
+            int value = leftNumber + rightNumber;
+            triangle[row][column] = value;
+            return value;
         }
 
     }
