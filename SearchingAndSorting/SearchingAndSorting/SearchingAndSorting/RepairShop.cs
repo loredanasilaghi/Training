@@ -11,7 +11,7 @@ namespace SearchingAndSorting
         {
             int[] initial = { 1, 3, 2, 1, 3, 2 };
             int[] expected = { 1, 1, 2, 2, 3, 3};
-            CollectionAssert.AreEquivalent(expected, QuickSort3(initial, 0, 5));
+            CollectionAssert.AreEqual(expected, QuickSort3(initial, 0, 5));
         }
 
         [TestMethod]
@@ -19,7 +19,7 @@ namespace SearchingAndSorting
         {
             int[] initial = { 2, 3, 2, 1, 3, 3, 2, 1, 1, 2 };
             int[] expected = { 1, 1, 1, 2, 2, 2, 2, 3, 3, 3 };
-            CollectionAssert.AreEquivalent(expected, QuickSort3(initial, 0, 9));
+            CollectionAssert.AreEqual(expected, QuickSort3(initial, 0, 9));
         }
 
         [TestMethod]
@@ -27,15 +27,7 @@ namespace SearchingAndSorting
         {
             int[] initial = { 3, 1, 3, 1 };
             int[] expected = { 1, 1, 3, 3 };
-            CollectionAssert.AreEquivalent(expected, QuickSort3(initial, 0, 3));
-        }
-        
-        [TestMethod]
-        public void TestRandomCasesStartingWith3()
-        {
-            int[] initial = { 3, 1, 2 };
-            int[] expected = { 1, 2, 3 };
-            CollectionAssert.AreEquivalent(expected, QuickSort3(initial, 0, 2));
+            CollectionAssert.AreEqual(expected, QuickSort3(initial, 0, 3));
         }
 
         [TestMethod]
@@ -43,7 +35,7 @@ namespace SearchingAndSorting
         {
             int[] initial = { 3 };
             int[] expected = { 3 };
-            CollectionAssert.AreEquivalent(expected, QuickSort3(initial, 0, 0));
+            CollectionAssert.AreEqual(expected, QuickSort3(initial, 0, 0));
         }
 
         [TestMethod]
@@ -51,7 +43,7 @@ namespace SearchingAndSorting
         {
             int[] initial = { 3, 2 };
             int[] expected = { 2, 3 };
-            CollectionAssert.AreEquivalent(expected, QuickSort3(initial, 0, 1));
+            CollectionAssert.AreEqual(expected, QuickSort3(initial, 0, 1));
         }
 
         public static int[] QuickSort3(int[] numbers, int first, int last)
@@ -64,6 +56,7 @@ namespace SearchingAndSorting
             {
                 if (numbers[element] < pivotValue)
                 {
+                    Swap(numbers, lessThan, element);
                     lessThan++;
                     element++;
                 }
