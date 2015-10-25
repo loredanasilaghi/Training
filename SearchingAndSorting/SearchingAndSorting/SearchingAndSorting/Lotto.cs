@@ -18,12 +18,11 @@ namespace SearchingAndSorting
 
         public static bool IsSorted(int[] numbers)
         {
-            bool isSorted = false;
+            bool isSorted = true;
             for (int i = 0; i < numbers.Length - 1; i++)
             {
-                isSorted = false;
-                if (numbers[i] < numbers[i + 1])
-                    isSorted = true;
+                if (numbers[i] > numbers[i + 1])
+                    isSorted = false;
             }
             return isSorted;
         }
